@@ -1,9 +1,8 @@
 import styles from './Product.module.scss';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import ProductImage from './ProductImage/ProductImage';
 import ProductHeader from './ProductHeader/ProductHeader';
 import ProductForm from './ProductForm/ProductForm';
-
 
 const Product = props => {
   const colors = props.colors;
@@ -13,11 +12,16 @@ const Product = props => {
   const price = props.basePrice;
   const [activeColor, setActiveColor] = useState(0);
   const [activeSize, setActiveSize] = useState(0);
+  const additionalPrice = sizeArr[activeSize].additionalPrice;
+  
+   
+  const getPrice = (additionalPrice, price) => {
+    const totalPrice = additionalPrice + price
+    return(totalPrice);
+  };
 
-  const newArray = sizeArr.map (size => {
-    return(size);
-    });
-  const makePrice = newArray[activeSize].additionalPrice + price;
+  const totalCost = useMemo(() => {
+    return getPrice(additionalPrice, price)}, [additionalPrice, price])
 
   const handleActiveColor = color => {
     setActiveColor(color);
@@ -32,8 +36,8 @@ const Product = props => {
     console.log('Summary');
     console.log('=========');
     console.log('Name: ' + props.title );
-    console.log('Cena: ' + makePrice);
-    console.log('Rozmiar: ' + newArray[activeSize].name)
+    console.log('Cena: ' + totalCost);
+    console.log('Rozmiar: ' + sizeArr[activeSize].name)
     console.log('Kolor: ' + colors[activeColor])
   }
   
@@ -41,7 +45,7 @@ const Product = props => {
     <article className={styles.product}>
       <ProductImage name={name} activeColor={activeColor} colors={colors}/>
       <div>
-        <ProductHeader title={title} makePrice={makePrice} />
+        <ProductHeader title={title} totalCost={totalCost} />
         <ProductForm sizeArr={sizeArr} colors={colors} handleActiveColor={handleActiveColor} handleActiveSize={handleActiveSize} activeSize={activeSize} activeColor={activeColor} handleCart={handleCart}/>
       </div>
       
